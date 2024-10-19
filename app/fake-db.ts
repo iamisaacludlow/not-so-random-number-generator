@@ -15,7 +15,7 @@ const configData: ConfigData = {
     specificNumber: 0
 };
 
-var configDataPromise = new Promise<ConfigData>((resolve, reject) => {
+const configDataPromise = new Promise<ConfigData>((resolve) => {
     setTimeout(() => {
         resolve(configData)
     }, 250);

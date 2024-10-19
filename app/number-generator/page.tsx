@@ -2,7 +2,6 @@
 
 import { AppBar, Box, Button, IconButton, Toolbar, Typography } from "@mui/material";
 import { Grid2 as Grid } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
 import { ConfigData } from '@/app/fake-db';
 import { useEffect, useState } from "react";
 import { db } from "@/firebaseconfig";
@@ -26,7 +25,7 @@ export default function NumberGenerator() {
             if (forcedRandomNumber != null) {
                 setRandomNumber(forcedRandomNumber);
             } else {
-                var nextRandomNumber = generateRandomNumber(configData.numberRange.lowLimit, configData?.numberRange.highLimit);
+                const nextRandomNumber = generateRandomNumber(configData.numberRange.lowLimit, configData?.numberRange.highLimit);
                 setRandomNumber(nextRandomNumber);
             }
         }, 200)
@@ -51,7 +50,7 @@ export default function NumberGenerator() {
                 throw new Error('Config data is not set in database');
             }
 
-            var nextForcedNumber: number | null;
+            let nextForcedNumber: number | null = null;
             switch (configData?.mode) {
                 case 'even':
                     nextForcedNumber = generateEvenNumber(configData.numberRange.lowLimit, configData?.numberRange.highLimit);
@@ -65,8 +64,6 @@ export default function NumberGenerator() {
                 case 'random':
                     nextForcedNumber = generateRandomNumber(configData.numberRange.lowLimit, configData?.numberRange.highLimit);
                     break;
-                default:
-                    nextForcedNumber = null;
             }
 
             console.log('Next forced number: ' + nextForcedNumber);
