@@ -36,33 +36,28 @@ export default function NumberGenerator() {
     }, [nextRandomNumberButtonClicked]);
     
     useEffect(() => {
+        if (randomNumber === forcedRandomNumber || nextRandomNumberButtonClicked === 0) {
+            setForcedRandomNumber(null);
+            return;
+        }
+
         const forcedModeTimer = setTimeout(async () => {
-            if (randomNumber === forcedRandomNumber) {
-                setForcedRandomNumber(null);
-                return;
-            }
 
-            const docRef = doc(db, "default", "configs");
-            const docSnap = await getDoc(docRef);
-
-            const configurationData = docSnap.data();
-            if (configurationData == null) {
-                throw new Error('Config data is not set in database');
-            }
+            const configurationData = await dataFetcher();
 
             let nextForcedNumber: number | null = null;
-            switch (configData?.mode) {
+            switch (configurationData?.mode) {
                 case 'even':
-                    nextForcedNumber = generateEvenNumber(configData.numberRange.lowLimit, configData?.numberRange.highLimit);
+                    nextForcedNumber = generateEvenNumber(configurationData.numberRange.lowLimit, configurationData?.numberRange.highLimit);
                     break;
                 case 'odd':
-                    nextForcedNumber = generateOddNumber(configData.numberRange.lowLimit, configData?.numberRange.highLimit);
+                    nextForcedNumber = generateOddNumber(configurationData.numberRange.lowLimit, configurationData?.numberRange.highLimit);
                     break;
                 case 'specific':
-                    nextForcedNumber = configData.specificNumber;
+                    nextForcedNumber = configurationData.specificNumber;
                     break;
                 case 'random':
-                    nextForcedNumber = generateRandomNumber(configData.numberRange.lowLimit, configData?.numberRange.highLimit);
+                    nextForcedNumber = generateRandomNumber(configurationData.numberRange.lowLimit, configurationData?.numberRange.highLimit);
                     break;
             }
 
@@ -70,7 +65,7 @@ export default function NumberGenerator() {
 
             setConfigData((configurationData as ConfigData));
             setForcedRandomNumber(nextForcedNumber);
-        }, (configData?.delay ?? 2) * 1000);
+        }, (configData?.delay ?? 2) * 1000); // Known bug: updating the delay will need a page refresh to take effect. Not sure how to fix this
 
         return () => clearTimeout(forcedModeTimer);
     }, [randomNumber])
@@ -85,6 +80,8 @@ export default function NumberGenerator() {
         }
 
         setConfigData((configurationData as ConfigData));
+
+        return configurationData;
     }
 
     function handleNextNumber() {
